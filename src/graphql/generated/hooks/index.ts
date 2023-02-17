@@ -1,8 +1,19 @@
+import { GraphQLClient } from 'graphql-request';
+import { RequestInit } from 'graphql-request/dist/types.dom';
+import { useQuery, UseQueryOptions } from '@tanstack/react-query';
 export type Maybe<T> = T | null;
 export type InputMaybe<T> = Maybe<T>;
 export type Exact<T extends { [key: string]: unknown }> = { [K in keyof T]: T[K] };
 export type MakeOptional<T, K extends keyof T> = Omit<T, K> & { [SubKey in K]?: Maybe<T[SubKey]> };
 export type MakeMaybe<T, K extends keyof T> = Omit<T, K> & { [SubKey in K]: Maybe<T[SubKey]> };
+
+function fetcher<TData, TVariables extends { [key: string]: any }>(client: GraphQLClient, query: string, variables?: TVariables, requestHeaders?: RequestInit['headers']) {
+  return async (): Promise<TData> => client.request({
+    document: query,
+    variables,
+    requestHeaders
+  });
+}
 /** All built-in and custom scalars, mapped to their actual values */
 export type Scalars = {
   ID: string;
@@ -1300,7 +1311,43 @@ export type VehiclesEdge = {
   node?: Maybe<Vehicle>;
 };
 
-export type QueryQueryVariables = Exact<{ [key: string]: never; }>;
+export type AllFilmsQueryVariables = Exact<{ [key: string]: never; }>;
 
 
-export type QueryQuery = { __typename?: 'Root', allFilms?: { __typename?: 'FilmsConnection', films?: Array<{ __typename?: 'Film', title?: string | null, director?: string | null, releaseDate?: string | null, speciesConnection?: { __typename?: 'FilmSpeciesConnection', species?: Array<{ __typename?: 'Species', name?: string | null, classification?: string | null, homeworld?: { __typename?: 'Planet', name?: string | null } | null } | null> | null } | null } | null> | null } | null };
+export type AllFilmsQuery = { __typename?: 'Root', allFilms?: { __typename?: 'FilmsConnection', films?: Array<{ __typename?: 'Film', title?: string | null, director?: string | null, releaseDate?: string | null, speciesConnection?: { __typename?: 'FilmSpeciesConnection', species?: Array<{ __typename?: 'Species', name?: string | null, classification?: string | null, homeworld?: { __typename?: 'Planet', name?: string | null } | null } | null> | null } | null } | null> | null } | null };
+
+
+export const AllFilmsDocument = `
+    query AllFilms {
+  allFilms {
+    films {
+      title
+      director
+      releaseDate
+      speciesConnection {
+        species {
+          name
+          classification
+          homeworld {
+            name
+          }
+        }
+      }
+    }
+  }
+}
+    `;
+export const useAllFilmsQuery = <
+      TData = AllFilmsQuery,
+      TError = unknown
+    >(
+      client: GraphQLClient,
+      variables?: AllFilmsQueryVariables,
+      options?: UseQueryOptions<AllFilmsQuery, TError, TData>,
+      headers?: RequestInit['headers']
+    ) =>
+    useQuery<AllFilmsQuery, TError, TData>(
+      variables === undefined ? ['AllFilms'] : ['AllFilms', variables],
+      fetcher<AllFilmsQuery, AllFilmsQueryVariables>(client, AllFilmsDocument, variables, headers),
+      options
+    );

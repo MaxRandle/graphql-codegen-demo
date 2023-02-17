@@ -5,13 +5,16 @@ const config: CodegenConfig = {
   schema: "https://swapi-graphql.netlify.app/.netlify/functions/index",
   documents: "src/graphql/**/*.graphql",
   generates: {
-    "src/graphql/generated.ts": {
-      // preset: "client",
-      plugins: ["typescript", "typescript-operations"],
+    "src/graphql/generated/hooks/index.ts": {
+      plugins: [
+        "typescript",
+        "typescript-operations",
+        "typescript-react-query",
+      ],
+      config: {
+        fetcher: "graphql-request",
+      },
     },
-    // "./graphql.schema.json": {
-    //   plugins: ["introspection"],
-    // },
   },
 };
 
